@@ -273,6 +273,13 @@ class Packet(BasePacket):
                                   ct.punct(">"))
     def __str__(self):
         return self.build()
+    def __hex__(self):
+        s = "0x"
+        x = str(self)
+        l = len(x)        
+        for i in xrange(l):
+            s += "%02x" % ord(x[i])
+        return s
     def __div__(self, other):
         if isinstance(other, Packet):
             cloneA = self.copy()
@@ -577,6 +584,12 @@ Creates an EPS file describing a packet. If filename is not provided a temporary
         return s
 
     def do_dissect(self, s):
+        l=len(s)
+        if l>2 and s[0:2]=="0x":
+            tmp=""
+            for i in xrange(2,l,2):
+                tmp+=chr(int(s[i:i+2],16))
+            s=tmp
         raw = s
         self.raw_packet_cache_fields = {}
         for f in self.fields_desc:
